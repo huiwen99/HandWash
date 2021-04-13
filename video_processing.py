@@ -1,5 +1,6 @@
 import cv2
 import random
+import numpy as np
 
 def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, random_frames=True):
     """
@@ -7,7 +8,7 @@ def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, rando
     """
     # Process the video
     cap = cv2.VideoCapture(filename)
-    total_num_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    total_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
     if random_frames:
         # Get indices of the frames in randomly, and then sort
@@ -21,7 +22,7 @@ def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, rando
     # Return n frames for each video in numpy format
     framearray = []
     for i in range(target_num_frames):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, frames[i])
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frames_idxs[i])
         ret, frame = cap.read()
 
         # Resize the image to feed into neural network
