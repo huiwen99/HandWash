@@ -13,7 +13,7 @@ class Handwash_Dataset(Dataset):
 
     def __init__(self, group):
         """
-        Constructor for generic Dataset class - simply assembles important parameters in attributes.
+        Constructor for Dataset class
 
         Parameters:
             - group should be set to test, train or val
