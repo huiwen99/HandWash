@@ -44,6 +44,7 @@ use_cuda = cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
 model = build_model()
+model.to(device)
 train_loader = dataloader('train', batch_size, num_frames)
 val_loader = dataloader('val', batch_size, num_frames)
 test_loader = dataloader('test', batch_size, num_frames)
@@ -52,7 +53,7 @@ test_loader = dataloader('test', batch_size, num_frames)
 if checkpoint:
     model = load_model(model_name, checkpoint)
 
-optimizer = optim.Adam(model.parameters(), lr=learning_rate, betas=(beta1, beta2), weight_decay=weight_decay)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, betas=(beta1, beta2), weight_decay=weight_decay)
 scheduler = StepLR(optimizer, step_size=step_size, gamma=gamma)
 
 train_losses = []

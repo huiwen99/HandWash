@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torchvision import transforms, utils
+import torch.nn.functional as F
 
 class CNN_LSTM(nn.Module):
     """"
@@ -84,7 +85,35 @@ class CNN_LSTM(nn.Module):
         return outputs
 
 
+class CNN_LSTM1(nn.Module):
+    """
+    Model with Convolutional LSTM architecture
+    """
 
+    def __init__(self):
+        super(CNN_LSTM1, self).__init__()
+        self.conv = nn.Conv2d(3, 16, 3, stride=1, padding=1)
+        self.fc = nn.Linear(64*64*16,128)
+        self.rnn = nn.LSTM(128, 64, num_layers=1)
+        self.classifier = nn.Linear(64, 12)
+
+    def forward(self, inputs, hidden=None):
+
+        # seq_len, batch_size, no. of features
+        lstm_in = torch.zeros(len(inputs[0]), len(inputs), self.rnn.input_size).cuda()
+        for j in range(len(inputs[0])):
+            frame_batch = inputs[:,j,:,:]
+            x = self.conv(frame_batch)
+            x = x.view(x.size(0), -1)
+            x = self.fc(x)
+            lstm_in[j] = x
+
+        outputs, hidden = self.rnn(lstm_in, hidden)
+        # take the last output of sequence
+        outputs = outputs[-1]
+        outputs = self.classifier(outputs)
+        output = F.log_softmax(outputs, dim=1)
+        return output
 
 
 
@@ -92,5 +121,5 @@ def build_model():
     """
     Initializes and returns model
     """
-    model = CNN_LSTM() # can change this
-    return model()
+    model = CNN_LSTM1() # can change this
+    return model

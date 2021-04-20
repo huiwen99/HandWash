@@ -61,6 +61,7 @@ def predict(model, video_path, num_frames):
     """
     frame_size = (64,64)
     arr = video_to_3d(video_path, num_frames, frame_size, color=True, random_frames=False)
+    arr = arr.transpose(0, 3, 1, 2)
     arr = np.asarray(arr) / 255
     arr = torch.from_numpy(arr).float()
     output = model(arr)

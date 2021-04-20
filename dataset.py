@@ -113,7 +113,7 @@ class Handwash_Dataset(Dataset):
         else:
             random_frames = False
         arr = video_to_3d(filename, self.num_frames, self.frame_size, color=True, random_frames=random_frames)
-
+        arr = arr.transpose(0, 3, 1, 2)
         # normalize
         arr = np.asarray(arr) / 255
 
