@@ -1,7 +1,7 @@
 import argparse
 from model import *
 from dataset import *
-from utils import plot_curves
+from utils import *
 import torch
 import torch.optim
 from torch.utils.data import DataLoader
