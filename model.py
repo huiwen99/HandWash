@@ -82,4 +82,15 @@ class CNN_LSTM(nn.Module):
         outputs, hidden = self.rnn(fs, hidden)
         outputs = self.fc(outputs)
         return outputs
-    
+
+
+
+
+
+
+def build_model():
+    """
+    Initializes and returns model
+    """
+    model = CNN_LSTM() # can change this
+    return model()

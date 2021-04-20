@@ -11,7 +11,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group):
+    def __init__(self, group, num_frames=10):
         """
         Constructor for Dataset class
 
@@ -21,7 +21,7 @@ class Handwash_Dataset(Dataset):
         """
 
         # Number of frames per video
-        self.num_frames = 10
+        self.num_frames = num_frames
 
         # Size of frame
         self.frame_size = (64,64)
@@ -214,14 +214,14 @@ class Handwash_Dataset(Dataset):
         label = torch.Tensor(one_hot)
 
         vid = self.open_video(class_val, index)
-        vid = torch.from_numpy(vid)
+        vid = torch.from_numpy(vid).float()
         return vid, label
 
 
-def dataloader(group, batch_size=4, shuffle=True):
+def dataloader(group, batch_size=4, num_frames=10, shuffle=True):
     """
     Loads Dataset and returns DataLoader
     """
-    dataset = Handwash_Dataset(group)
+    dataset = Handwash_Dataset(group, num_frames)
     dataloader = DataLoader(dataset, batch_size, shuffle)
     return dataloader
