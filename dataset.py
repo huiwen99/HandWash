@@ -10,7 +10,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, preproc=False, num_frames=10):
+    def __init__(self, group, edge=False, num_frames=10):
         """
         Constructor for Dataset class
 
@@ -43,7 +43,7 @@ class Handwash_Dataset(Dataset):
         self.group = group
         
         # Whether to preprocess the data
-        self.preproc = preproc
+        self.edge = edge
 
         # Path to videos in the dataset
         root_dir = './dataset/{}'.format(self.group)
@@ -113,16 +113,10 @@ class Handwash_Dataset(Dataset):
             random_frames = True
         else:
             random_frames = False
-        
-        if self.preproc:
-            # can pass in preproc as a dict to test for diff preprocessing
-            edge = True
-        else:
-            edge = False
             
-        arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=edge)
+        arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=self.edge)
         while(len(arr) != self.num_frames):
-            arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=edge)
+            arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=self.edge)
         # normalize
         arr = np.asarray(arr) / 255
 
@@ -227,10 +221,10 @@ class Handwash_Dataset(Dataset):
         return vid, label
 
 
-def dataloader(group, batch_size=4, num_frames=10, shuffle=True):
+def dataloader(group, batch_size=4, num_frames=10, shuffle=True,edge=False):
     """
     Loads Dataset and returns DataLoader
     """
-    dataset = Handwash_Dataset(group, num_frames)
+    dataset = Handwash_Dataset(group, num_frames,edge)
     dataloader = DataLoader(dataset, batch_size, shuffle)
     return dataloader

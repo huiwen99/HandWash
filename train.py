@@ -23,6 +23,7 @@ parser.add_argument("--step_size", type=int, default=1, help="set scheduler step
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 parser.add_argument("--checkpoint", type=str, default=None, help="checkpoint to load model")
 parser.add_argument("--save_dir", type=str, default=None, help="file path to save the model")
+parser.add_argument("--edge", type=bool, default=False, help="apply edge detection, bool")
 
 # get arugments
 args = parser.parse_args()
@@ -39,6 +40,7 @@ step_size = args.step_size
 cuda = args.cuda
 save_dir = args.save_dir
 checkpoint = args.checkpoint
+edge = args.edge
 
 # set cpu / gpu
 use_cuda = cuda and torch.cuda.is_available()
@@ -46,9 +48,9 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 model = build_model(arch)
 model.to(device)
-train_loader = dataloader('train', batch_size, num_frames)
-val_loader = dataloader('val', batch_size, num_frames)
-test_loader = dataloader('test', batch_size, num_frames)
+train_loader = dataloader('train', batch_size, num_frames, edge)
+val_loader = dataloader('val', batch_size, num_frames, edge)
+test_loader = dataloader('test', batch_size, num_frames, edge)
 
 # initialize model and optimizer
 if checkpoint:
