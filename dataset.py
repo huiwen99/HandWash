@@ -11,7 +11,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, num_frames=10):
+    def __init__(self, group, num_frames=10,edge=False):
         """
         Constructor for Dataset class
 
@@ -42,9 +42,10 @@ class Handwash_Dataset(Dataset):
 
         # Dataset should belong to only one group: train, test or val
         self.group = group
-
+        self.edge = edge 
         # Path to videos in the dataset
-        dir = './dataset/{}'.format(self.group)
+#         dir = './dataset/{}'.format(self.group)
+        dir = './mock_dataset' 
         self.dataset_paths = {'step_1': dir+'/Step_1', \
                               'step_2_left': dir+'/Step_2_Left', \
                               'step_2_right': dir+'/Step_2_Right', \
@@ -112,8 +113,11 @@ class Handwash_Dataset(Dataset):
             random_frames = True
         else:
             random_frames = False
-        arr = video_to_3d(filename, self.num_frames, self.frame_size, color=True, random_frames=random_frames)
-        arr = arr.transpose(0, 3, 1, 2)
+        arr = video_to_3d(filename, self.num_frames, self.frame_size, color=True, random_frames=random_frames,edge=self.edge)
+
+        if arr.shape[-1] !=3 and len(arr.shape)==4:
+            arr = arr.transpose(0, 3, 1, 2)
+            
         # normalize
         arr = np.asarray(arr) / 255
 
@@ -218,10 +222,10 @@ class Handwash_Dataset(Dataset):
         return vid, label
 
 
-def dataloader(group, batch_size=4, num_frames=10, shuffle=True):
+def dataloader(group, batch_size=4, num_frames=10, shuffle=True,edge=False):
     """
     Loads Dataset and returns DataLoader
     """
-    dataset = Handwash_Dataset(group, num_frames)
+    dataset = Handwash_Dataset(group, num_frames,edge)
     dataloader = DataLoader(dataset, batch_size, shuffle)
     return dataloader

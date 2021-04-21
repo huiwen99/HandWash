@@ -2,7 +2,7 @@ import cv2
 import random
 import numpy as np
 
-def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, random_frames=True):
+def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, random_frames=True,edge=False,edge_u=300,edge_l=250):
     """
     Converts a video into n number of frames in numpy format
     """
@@ -27,7 +27,11 @@ def video_to_3d(filename, target_num_frames, img_size=(64,64), color=True, rando
 
         # Resize the image to feed into neural network
         frame = cv2.resize(frame, img_size)
-    
+        
+        # Edge detection
+        if edge:
+            frame = cv2.Canny(frame,edge_u,edge_l)
+
         if color: # 3 channels
             framearray.append(frame)
         else: # 1 channel

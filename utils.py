@@ -55,12 +55,12 @@ def evaluate(model, device, data_loader):
 
     return loss, acc
 
-def predict(model, video_path, num_frames):
+def predict(model, video_path, num_frames, edge=False):
     """
     Predicts the label of the video given its filepath
     """
     frame_size = (64,64)
-    arr = video_to_3d(video_path, num_frames, frame_size, color=True, random_frames=False)
+    arr = video_to_3d(video_path, num_frames, frame_size, color=True, random_frames=False, edge=edge)
     arr = arr.transpose(0, 3, 1, 2)
     arr = np.asarray(arr) / 255
     arr = torch.from_numpy(arr).float()
