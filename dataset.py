@@ -10,7 +10,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, edge=False, num_frames=10):
+    def __init__(self, group, num_frames=10, edge=False):
         """
         Constructor for Dataset class
 
@@ -221,10 +221,10 @@ class Handwash_Dataset(Dataset):
         return vid, label
 
 
-def dataloader(group, batch_size=4, num_frames=10, shuffle=True,edge=False):
+def dataloader(group, batch_size=4, num_frames=10,edge=False,shuffle=True):
     """
     Loads Dataset and returns DataLoader
     """
-    dataset = Handwash_Dataset(group, num_frames,edge)
+    dataset = Handwash_Dataset(group, num_frames, edge)
     dataloader = DataLoader(dataset, batch_size, shuffle)
     return dataloader

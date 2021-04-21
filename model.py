@@ -15,11 +15,11 @@ class CNN_LSTM(nn.Module):
          # select a base model
         if arch.startswith('alexnet'):
             net = models.alexnet(pretrained=True)
-            self.conv = net.features
+            self.features = net.features
             self.fc = nn.Sequential(nn.Linear(256, 128), nn.Dropout())
         else:
-            self.conv = nn.Conv2d(3, 16, 3, stride=1, padding=1)
-            self.fc = nn.Sequential(nn.Linear(64*64*16, 128), nn.Dropout())
+            self.features = nn.Sequential(nn.Conv2d(3, 16, 3, stride=1, padding=1), nn.Linear(64*64*16, 256))
+            self.fc = nn.Sequential(nn.Linear(256, 128), nn.Dropout())
             
         self.rnn = nn.LSTM(128, 64, num_layers = 1)
         self.classifier = nn.Linear(64, 12)
@@ -32,7 +32,7 @@ class CNN_LSTM(nn.Module):
         for j in range(seq_length):
             frame_batch = inputs[:,j,:,:]
             x = frame_batch.unsqueeze(1).repeat(1,3,1,1) # pretrained model expects 3 channels
-            x = self.conv(x)
+            x = self.features(x)
             x = x.view(x.size(0), -1)
             x = self.fc(x)
             lstm_in[j] = x
