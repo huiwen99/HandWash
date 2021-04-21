@@ -1,10 +1,11 @@
 from model import *
-import datetime
-from video_processing import *
-import numpy as np
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
+import numpy as np
+import cv2
+import datetime
+import random
 
 def train(model, device, train_loader, val_loader, optimizer, epoch):
     """
@@ -81,11 +82,48 @@ def predict(model, video_path, num_frames):
     prediction = classes[pred]
     return prediction
 
-def load_model(model_path):
+def video_to_3d(filename, target_num_frames, img_size=(64,64), random_frames=True, edge=True):
+    """
+    Converts a video into n number of frames in numpy format
+    """
+    # Process the video
+    cap = cv2.VideoCapture(filename)
+    total_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    
+    if random_frames:
+        # Get indices of the frames in randomly, and then sort
+        frames_idxs = random.sample(range(0, total_num_frames), target_num_frames)
+        frames_idxs.sort()
+    else:
+        # Get indices of the frames in equal intervals
+        ratio = total_num_frames / target_num_frames
+        frames_idxs = [int(x * ratio) for x in range(target_num_frames)]
+    
+    # Return n frames for each video in numpy format
+    framearray = []
+    for i in range(target_num_frames):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frames_idxs[i])
+        ret, frame = cap.read()
+        
+        # only process the valid images
+        if ret:
+            # Resize the image to feed into neural network
+            frame = cv2.resize(frame, img_size)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            if edge:
+                frame = cv2.Canny(frame, 300, 250)
+
+            framearray.append(frame)
+
+    cap.release()
+    
+    return np.array(framearray)
+
+def load_model(model, model_path):
     """
     Load model from file path
     """
-    model = build_model()
     model.load_state_dict(torch.load(model_path))
     return model
 

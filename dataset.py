@@ -1,17 +1,16 @@
-from video_processing import *
+from utils import video_to_3d
 import torch
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-import os, os.path
-import numpy as np
+from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
+import numpy as np
+import os, os.path
 
 class Handwash_Dataset(Dataset):
     """
     Dataset Class
     """
 
-    def __init__(self, group, num_frames=10):
+    def __init__(self, group, preproc=False, num_frames=10):
         """
         Constructor for Dataset class
 
@@ -42,21 +41,24 @@ class Handwash_Dataset(Dataset):
 
         # Dataset should belong to only one group: train, test or val
         self.group = group
+        
+        # Whether to preprocess the data
+        self.preproc = preproc
 
         # Path to videos in the dataset
-        dir = './dataset/{}'.format(self.group)
-        self.dataset_paths = {'step_1': dir+'/Step_1', \
-                              'step_2_left': dir+'/Step_2_Left', \
-                              'step_2_right': dir+'/Step_2_Right', \
-                              'step_3': dir+'/Step_3', \
-                              'step_4_left': dir+'/Step_4_Left', \
-                              'step_4_right': dir+'/Step_4_Right', \
-                              'step_5_left': dir+'/Step_5_Left', \
-                              'step_5_right': dir+'/Step_5_Right', \
-                              'step_6_left': dir+'/Step_6_Left', \
-                              'step_6_right': dir+'/Step_6_Right', \
-                              'step_7_left': dir+'/Step_7_Left', \
-                              'step_7_right': dir+'/Step_7_Right'}
+        root_dir = './dataset/{}'.format(self.group)
+        self.dataset_paths = {'step_1': root_dir+'/Step_1', \
+                              'step_2_left': root_dir+'/Step_2_Left', \
+                              'step_2_right': root_dir+'/Step_2_Right', \
+                              'step_3': root_dir+'/Step_3', \
+                              'step_4_left': root_dir+'/Step_4_Left', \
+                              'step_4_right': root_dir+'/Step_4_Right', \
+                              'step_5_left': root_dir+'/Step_5_Left', \
+                              'step_5_right': root_dir+'/Step_5_Right', \
+                              'step_6_left': root_dir+'/Step_6_Left', \
+                              'step_6_right': root_dir+'/Step_6_Right', \
+                              'step_7_left': root_dir+'/Step_7_Left', \
+                              'step_7_right': root_dir+'/Step_7_Right'}
 
         # Number of videos for each class in the dataset
         self.dataset_numbers = {}
@@ -68,19 +70,18 @@ class Handwash_Dataset(Dataset):
             self.dataset_numbers[key] = len(files)
             self.dataset_filenames[key] = files
 
-
-
     def describe(self):
         """
         Descriptor function.
         Will print details about the dataset when called.
         """
 
-        msg = "This is the {} dataset from the HandWash Dataset".format(self.group)
+        msg = "This is the {} dataset from the HandWash Dataset ".format(self.group)
         msg += "used for the Big Project in the 50.039 Deep Learning class. \n"
         msg += "It contains a total of {} videos. \n".format(sum(self.dataset_numbers.values()))
         msg += "The videos are stored in the following locations "
         msg += "and each one contains the following number of videos:\n"
+        
         for key, val in self.dataset_paths.items():
             msg += " - {}, in folder {}: {} videos.\n".format(key, val, self.dataset_numbers[key])
         print(msg)
@@ -112,8 +113,16 @@ class Handwash_Dataset(Dataset):
             random_frames = True
         else:
             random_frames = False
-        arr = video_to_3d(filename, self.num_frames, self.frame_size, color=True, random_frames=random_frames)
-        arr = arr.transpose(0, 3, 1, 2)
+        
+        if self.preproc:
+            # can pass in preproc as a dict to test for diff preprocessing
+            edge = True
+        else:
+            edge = False
+            
+        arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=edge)
+        while(len(arr) != self.num_frames):
+            arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=edge)
         # normalize
         arr = np.asarray(arr) / 255
 
