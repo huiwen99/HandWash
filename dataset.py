@@ -1,16 +1,17 @@
-from utils import video_to_3d
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
+import cv2
 import numpy as np
 import os, os.path
+import random
 
 class Handwash_Dataset(Dataset):
     """
     Dataset Class
     """
 
-    def __init__(self, group, num_frames=10, edge=False):
+    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, edge=False):
         """
         Constructor for Dataset class
 
@@ -23,7 +24,7 @@ class Handwash_Dataset(Dataset):
         self.num_frames = num_frames
 
         # Size of frame
-        self.frame_size = (64,64)
+        self.frame_size = frame_size
 
         # 12 classes: 1 for each of the 7 steps (hand specified if any)
         self.classes = {0: 'step_1',
@@ -44,22 +45,31 @@ class Handwash_Dataset(Dataset):
         
         # Whether to preprocess the data
         self.edge = edge
-
-        # Path to videos in the dataset
-        root_dir = './dataset/{}'.format(self.group)
-        self.dataset_paths = {'step_1': root_dir+'/Step_1', \
-                              'step_2_left': root_dir+'/Step_2_Left', \
-                              'step_2_right': root_dir+'/Step_2_Right', \
-                              'step_3': root_dir+'/Step_3', \
-                              'step_4_left': root_dir+'/Step_4_Left', \
-                              'step_4_right': root_dir+'/Step_4_Right', \
-                              'step_5_left': root_dir+'/Step_5_Left', \
-                              'step_5_right': root_dir+'/Step_5_Right', \
-                              'step_6_left': root_dir+'/Step_6_Left', \
-                              'step_6_right': root_dir+'/Step_6_Right', \
-                              'step_7_left': root_dir+'/Step_7_Left', \
-                              'step_7_right': root_dir+'/Step_7_Right'}
-
+        
+        # Actual Dataset - not including our own
+        self.db_dir = './HandWashDataset'
+        
+        # Numpy Dataset
+        self.output_dir = output_dir
+        
+        if not self.check_processed():
+            print('Preprocessing of dataset, this will take long.')
+            self.process_all_videos()
+        
+        group_dir = output_dir + '/{}'.format(self.group)
+        self.dataset_paths = {'step_1': group_dir+'/Step_1', \
+                              'step_2_left': group_dir+'/Step_2_Left', \
+                              'step_2_right': group_dir+'/Step_2_Right', \
+                              'step_3': group_dir+'/Step_3', \
+                              'step_4_left': group_dir+'/Step_4_Left', \
+                              'step_4_right': group_dir+'/Step_4_Right', \
+                              'step_5_left': group_dir+'/Step_5_Left', \
+                              'step_5_right': group_dir+'/Step_5_Right', \
+                              'step_6_left': group_dir+'/Step_6_Left', \
+                              'step_6_right': group_dir+'/Step_6_Right', \
+                              'step_7_left': group_dir+'/Step_7_Left', \
+                              'step_7_right': group_dir+'/Step_7_Right'}
+        
         # Number of videos for each class in the dataset
         self.dataset_numbers = {}
         # List of filenames of videos for each class in the dataset
@@ -70,6 +80,12 @@ class Handwash_Dataset(Dataset):
             self.dataset_numbers[key] = len(files)
             self.dataset_filenames[key] = files
 
+    def check_processed(self):
+        if not os.path.exists(self.output_dir):
+            return False
+        else:
+            return True
+    
     def describe(self):
         """
         Descriptor function.
@@ -109,18 +125,15 @@ class Handwash_Dataset(Dataset):
         # open video as numpy array
         filenames = self.dataset_filenames['{}'.format(class_val)]
         filename = '{}/{}'.format(self.dataset_paths['{}'.format(class_val)], filenames[index_val])
-        if self.group == 'train':
-            random_frames = True
-        else:
-            random_frames = False
-            
-        arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=self.edge)
-        while(len(arr) != self.num_frames):
-            arr = video_to_3d(filename, self.num_frames, self.frame_size, random_frames=random_frames, edge=self.edge)
-        # normalize
-        arr = np.asarray(arr) / 255
-
-        return arr
+        
+        # sample the right number of frames from the npy arrays
+        arr = np.load(filename)
+        frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
+        sorted_arr = np.array([arr[i] for i in frames_idxs])
+        
+        sorted_arr = sorted_arr.transpose(0, 3, 1, 2)
+        
+        return sorted_arr
 
     def show_video(self, class_val, index_val):
         """
@@ -133,6 +146,7 @@ class Handwash_Dataset(Dataset):
 
         # open video
         arr = self.open_video(class_val, index_val)
+        arr = arr.transpose(0, 2, 3, 1)
 
         # display
         for i in range(arr.shape[0]):
@@ -143,6 +157,66 @@ class Handwash_Dataset(Dataset):
             ax.axis('off')
         plt.show()
 
+    def process_all_videos(self):
+        if not os.path.exists(self.db_dir):
+            raise RuntimeError('Dataset not found or corrupted.' +
+                               ' You need to download it from https://www.kaggle.com/realtimear/hand-wash-dataset')
+            
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
+        
+        for group in ['train', 'val', 'test']:
+            group_dir = os.path.join(self.db_dir, group)
+            os.mkdir(os.path.join(self.output_dir, group))
+            for step in os.listdir(group_dir):
+                group_step_dir = os.path.join(group_dir, step)
+                os.mkdir(os.path.join(self.output_dir, group, step))
+                print("Converting to numpy files for {} ...".format(group_step_dir))
+                for idx, filename in enumerate(os.listdir(group_step_dir)):
+                    filepath = os.path.join(group_step_dir, filename)
+                    save_dir = os.path.join(self.output_dir, group, step, '000{}.npy'.format(idx))
+                    arr = self.video_to_3d(filepath)
+                    np.save(save_dir, arr)
+    
+    def video_to_3d(self, filename):
+        """
+        Preprocess video into frames
+        """
+        # Process the video
+        capture = cv2.VideoCapture(filename)
+        
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        # Make sure the video has at least 32 frames
+        EXTRACT_FREQUENCY = 4
+        if frame_count // EXTRACT_FREQUENCY <= 32:
+            EXTRACT_FREQUENCY -= 1
+            if frame_count // EXTRACT_FREQUENCY <= 32:
+                EXTRACT_FREQUENCY -= 1
+                if frame_count // EXTRACT_FREQUENCY <= 32:
+                    EXTRACT_FREQUENCY -= 1
+
+        # Return n frames for each video in numpy format
+        framearray = []
+        count = 0
+        retaining = True
+        
+        while (count < frame_count and retaining):
+            retaining, frame = capture.read()
+            if frame is None:
+                continue
+
+            if count % EXTRACT_FREQUENCY == 0:
+                frame = cv2.resize(frame, self.frame_size)
+                frame = np.asarray(frame) / 255
+                framearray.append(frame)
+                
+            count += 1
+
+        capture.release()
+
+        return np.array(framearray)
+    
     def __len__(self):
         """
         Length special method, returns the number of videos in dataset.
@@ -219,12 +293,3 @@ class Handwash_Dataset(Dataset):
         vid = self.open_video(class_val, index)
         vid = torch.from_numpy(vid).float()
         return vid, label
-
-
-def dataloader(group, batch_size=4, num_frames=10,edge=False,shuffle=True):
-    """
-    Loads Dataset and returns DataLoader
-    """
-    dataset = Handwash_Dataset(group, num_frames, edge)
-    dataloader = DataLoader(dataset, batch_size, shuffle)
-    return dataloader

@@ -16,10 +16,18 @@ class CNN_LSTM(nn.Module):
         if arch.startswith('alexnet'):
             net = models.alexnet(pretrained=True)
             self.features = net.features
+            for param in self.features.parameters():
+                param.requires_grad = False
             self.fc = nn.Sequential(nn.Linear(256, 128), nn.Dropout())
+        elif arch.startswith('resnet50'):
+            net = models.resnet50(pretrained=True)
+            self.features = nn.Sequential(*list(net.children())[:-1])
+            for param in self.features.parameters():
+                param.requires_grad = False
+            self.fc = nn.Sequential(nn.Linear(2048, 128), nn.Dropout())
         else:
-            self.features = nn.Sequential(nn.Conv2d(3, 16, 3, stride=1, padding=1), nn.Linear(64*64*16, 256))
-            self.fc = nn.Sequential(nn.Linear(256, 128), nn.Dropout())
+            self.features = nn.Conv2d(3, 16, 3, stride=1, padding=1)
+            self.fc = nn.Sequential(nn.Linear(16*64*64, 128), nn.Dropout())
             
         self.rnn = nn.LSTM(128, 64, num_layers = 1)
         self.classifier = nn.Linear(64, 12)
@@ -30,8 +38,8 @@ class CNN_LSTM(nn.Module):
         lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size).cuda()
             
         for j in range(seq_length):
-            frame_batch = inputs[:,j,:,:]
-            x = frame_batch.unsqueeze(1).repeat(1,3,1,1) # pretrained model expects 3 channels
+            x = inputs[:,j,:,:]
+            #x = x.unsqueeze(1).repeat(1,3,1,1) # pretrained model expects 3 channels
             x = self.features(x)
             x = x.view(x.size(0), -1)
             x = self.fc(x)

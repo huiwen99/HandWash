@@ -138,7 +138,7 @@ dmypy.json
 cython_debug/
 
 # Dataset
-dataset/
+HandWashDataset/
 
 # Other files
 .DS_Store

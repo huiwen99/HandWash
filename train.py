@@ -48,9 +48,16 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 model = build_model(arch)
 model.to(device)
-train_loader = dataloader('train', batch_size, num_frames, edge)
-val_loader = dataloader('val', batch_size, num_frames, edge)
-test_loader = dataloader('test', batch_size, num_frames, edge)
+
+# Dataset
+train_ds = Handwash_Dataset('train')
+val_ds = Handwash_Dataset('val')
+test_ds = Handwash_Dataset('test')
+
+# Dataloader
+train_loader = DataLoader(train_ds, batch_size, shuffle=True)
+val_loader = DataLoader(val_ds, batch_size, shuffle=True)
+test_loader = DataLoader(test_ds, 1, shuffle=False)
 
 # initialize model and optimizer
 if checkpoint:
