@@ -62,6 +62,8 @@ test_loader = DataLoader(test_ds, 1, shuffle=False)
 # initialize model and optimizer
 if checkpoint:
     model = load_model(model, checkpoint)
+    for param in model.parameters():
+        param.requires_grad = True
 
 optimizer = Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate, betas=(beta1, beta2), 
                  weight_decay=weight_decay)
@@ -87,9 +89,9 @@ for epoch in range(1, epochs + 1):
         best_val_score = val_acc
 
     if save_dir:
-        if val_acc >= best_test_score:
+        if val_acc >= best_val_score:
             torch.save(model.state_dict(), save_dir)
-            best_test_score = val_acc
+            best_val_score = val_acc
 
 # plot learning curves
 plot_curves(train_losses, val_losses, "Loss curves")

@@ -2,9 +2,11 @@ import torch
 from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
 import cv2
+import PIL
 import numpy as np
 import os, os.path
 import random
+import scipy.ndimage
 
 class Handwash_Dataset(Dataset):
     """
@@ -130,9 +132,14 @@ class Handwash_Dataset(Dataset):
         arr = np.load(filename)
         frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
         sorted_arr = np.array([arr[i] for i in frames_idxs])
-        
+
+        if self.group=='train':
+            sorted_arr = sorted_arr*255
+            sorted_arr = self.data_augment(sorted_arr)
+            sorted_arr = sorted_arr / 255
+
         sorted_arr = sorted_arr.transpose(0, 3, 1, 2)
-        
+
         return sorted_arr
 
     def show_video(self, class_val, index_val):
@@ -151,6 +158,9 @@ class Handwash_Dataset(Dataset):
         # display
         for i in range(arr.shape[0]):
             frame = arr[i]
+            # convert to rgb
+            frame = frame[:,:,::-1]
+            # frame = frame *255
             fig, ax = plt.subplots()
             ax.imshow(frame)
             ax.set_title('Frame {}'.format(i))
@@ -216,7 +226,51 @@ class Handwash_Dataset(Dataset):
         capture.release()
 
         return np.array(framearray)
-    
+
+    def contrast(self, imgs, factor):
+        """
+        Adds contrast to the sequence of images
+        """
+        factor = float(factor)
+        arr = np.clip(128 + factor * imgs - factor * 128, 0, 255).astype(np.uint8)
+        return arr
+
+    def rotate(self, imgs, angle):
+        """
+        Rotates the sequence of images
+        """
+        arr = scipy.ndimage.rotate(imgs, angle, axes=(2,1))
+        return arr
+
+    def center_crop(self, imgs):
+        """
+        Center crops the sequence of images
+        """
+        width, height = self.frame_size
+        w = imgs.shape[1]
+        h = imgs.shape[2]
+        start_x = w//2 - width//2
+        start_y = h//2 - height//2
+        arr = imgs[:,start_x:start_x+width, start_y:start_y+height,:]
+        return arr
+
+
+    def data_augment(self, imgs):
+        """
+        Performs transformation on the sequence of images
+        """
+
+        # contrast
+        contrast_factor = random.uniform(0.7,3)
+        arr = self.contrast(imgs,contrast_factor)
+        # rotation
+        rotate_angle = random.uniform(-3,3)
+        arr = self.rotate(arr,rotate_angle)
+        # center crop
+        arr = self.center_crop(arr)
+        return arr
+
+
     def __len__(self):
         """
         Length special method, returns the number of videos in dataset.
