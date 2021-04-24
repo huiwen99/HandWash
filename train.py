@@ -23,6 +23,7 @@ parser.add_argument("--step_size", type=int, default=1, help="set scheduler step
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 parser.add_argument("--checkpoint", type=str, default=None, help="checkpoint to load model")
 parser.add_argument("--save_dir", type=str, default=None, help="file path to save the model")
+parser.add_argument("--data_aug", type=bool, default=True, help="decide if data augmentation should be performed")
 
 # get arugments
 args = parser.parse_args()
@@ -39,7 +40,7 @@ step_size = args.step_size
 cuda = args.cuda
 save_dir = args.save_dir
 checkpoint = args.checkpoint
-edge = args.edge
+data_aug = args.data_aug
 
 # set cpu / gpu
 use_cuda = cuda and torch.cuda.is_available()
@@ -49,7 +50,7 @@ model = build_model(arch)
 model.to(device)
 
 # Dataset
-train_ds = Handwash_Dataset('train')
+train_ds = Handwash_Dataset('train', data_aug=data_aug)
 val_ds = Handwash_Dataset('val')
 test_ds = Handwash_Dataset('test')
 

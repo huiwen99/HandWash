@@ -8,45 +8,45 @@ import datetime
 import random
 
 def video_to_3d(filename, img_size=(128,128)):
-        """
-        Preprocess video into frames
-        """
-        # Process the video
-        capture = cv2.VideoCapture(filename)
-        
-        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    """
+    Preprocess video into frames
+    """
+    # Process the video
+    capture = cv2.VideoCapture(filename)
 
-        # Make sure the video has at least 32 frames
-        EXTRACT_FREQUENCY = 4
+    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Make sure the video has at least 32 frames
+    EXTRACT_FREQUENCY = 4
+    if frame_count // EXTRACT_FREQUENCY <= 32:
+        EXTRACT_FREQUENCY -= 1
         if frame_count // EXTRACT_FREQUENCY <= 32:
             EXTRACT_FREQUENCY -= 1
             if frame_count // EXTRACT_FREQUENCY <= 32:
                 EXTRACT_FREQUENCY -= 1
-                if frame_count // EXTRACT_FREQUENCY <= 32:
-                    EXTRACT_FREQUENCY -= 1
 
-        # Return n frames for each video in numpy format
-        framearray = []
-        count = 0
-        retaining = True
-        
-        while (count < frame_count and retaining):
-            retaining, frame = capture.read()
-            if frame is None:
-                continue
+    # Return n frames for each video in numpy format
+    framearray = []
+    count = 0
+    retaining = True
 
-            if count % EXTRACT_FREQUENCY == 0:
-                frame = cv2.resize(frame, img_size)
-                framearray.append(frame)
-            
-            if len(framearray) == 32:
-                break
-            
-            count += 1
+    while (count < frame_count and retaining):
+        retaining, frame = capture.read()
+        if frame is None:
+            continue
 
-        capture.release()
+        if count % EXTRACT_FREQUENCY == 0:
+            frame = cv2.resize(frame, img_size)
+            framearray.append(frame)
 
-        return np.array(framearray)
+        if len(framearray) == 32:
+            break
+
+        count += 1
+
+    capture.release()
+
+    return np.array(framearray)
 
 def train(model, device, train_loader, val_loader, optimizer, epoch):
     """
@@ -138,3 +138,4 @@ def plot_curves(train_arrs, val_arrs, plot_name):
     plt.title(plot_name)
     plt.legend()
     plt.show()
+    

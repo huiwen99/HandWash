@@ -14,7 +14,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, output_dir='./dataset', frame_size=(128,128), num_frames=16):
+    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, data_aug=True):
         """
         Constructor for Dataset class
 
@@ -45,6 +45,8 @@ class Handwash_Dataset(Dataset):
 
         # Dataset should belong to only one group: train, test or val
         self.group = group
+        
+        self.data_aug = data_aug
         
         # Actual Dataset - not including our own
         self.db_dir = './HandWashDataset'
@@ -134,7 +136,7 @@ class Handwash_Dataset(Dataset):
 #         frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
 #         arr = np.array([arr[i] for i in frames_idxs])
 
-        if self.group == 'train':
+        if self.group == 'train' and self.data_aug:
             arr = self.data_augment(arr)
             
         # resize
