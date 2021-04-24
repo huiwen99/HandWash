@@ -160,7 +160,7 @@ class Handwash_Dataset(Dataset):
             frame = arr[i]
             # convert to rgb
             frame = frame[:,:,::-1]
-            # frame = frame *255
+            
             fig, ax = plt.subplots()
             ax.imshow(frame)
             ax.set_title('Frame {}'.format(i))
@@ -235,39 +235,15 @@ class Handwash_Dataset(Dataset):
         arr = np.clip(128 + factor * imgs - factor * 128, 0, 255).astype(np.uint8)
         return arr
 
-    def rotate(self, imgs, angle):
-        """
-        Rotates the sequence of images
-        """
-        arr = scipy.ndimage.rotate(imgs, angle, axes=(2,1))
-        return arr
-
-    def center_crop(self, imgs):
-        """
-        Center crops the sequence of images
-        """
-        width, height = self.frame_size
-        w = imgs.shape[1]
-        h = imgs.shape[2]
-        start_x = w//2 - width//2
-        start_y = h//2 - height//2
-        arr = imgs[:,start_x:start_x+width, start_y:start_y+height,:]
-        return arr
-
-
     def data_augment(self, imgs):
         """
         Performs transformation on the sequence of images
         """
-
+        arr = imgs
         # contrast
-        contrast_factor = random.uniform(0.7,3)
+        contrast_factor = random.uniform(0.9,1.1)
         arr = self.contrast(imgs,contrast_factor)
-        # rotation
-        rotate_angle = random.uniform(-3,3)
-        arr = self.rotate(arr,rotate_angle)
-        # center crop
-        arr = self.center_crop(arr)
+        
         return arr
 
 

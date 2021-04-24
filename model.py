@@ -29,8 +29,9 @@ class CNN_LSTM(nn.Module):
             self.features = nn.Conv2d(3, 16, 3, stride=1, padding=1)
             self.fc = nn.Sequential(nn.Linear(16*64*64, 128), nn.Dropout())
             
-        self.rnn = nn.LSTM(128, 64, num_layers = 1)
-        self.classifier = nn.Linear(64, 12)
+        self.rnn = nn.LSTM(128, 256, num_layers = 1)
+        self.fc2 = nn.Sequential(nn.Linear(256, 512), nn.ReLU(), nn.Dropout())
+        self.classifier = nn.Linear(512, 12)
 
     def forward(self, inputs, hidden=None):
         seq_length = len(inputs[0])
@@ -48,6 +49,7 @@ class CNN_LSTM(nn.Module):
         outputs, hidden = self.rnn(lstm_in, hidden)
         # take the last output of sequence
         outputs = outputs[-1]
+        outputs = self.fc2(outputs)
         outputs = self.classifier(outputs)
         output = F.log_softmax(outputs, dim=1)
         return output
