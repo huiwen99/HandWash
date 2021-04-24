@@ -193,8 +193,12 @@ class Handwash_Dataset(Dataset):
                     np.save(save_dir, arr)
 
     def resize(self, imgs):
-        # TODO: resize (batch_size, 224, 224, 3) to (batch_size, 112, 112, 3)
-        return imgs
+        resized_imgs = []
+        for img in imgs:
+            resized = cv2.resize(img, self.frame_size)
+            resized_imgs.append(resized)
+            
+        return np.array(resized_imgs)
     
     def time_crop(self, buffer, clip_len):
         # randomly select time index for temporal jittering
