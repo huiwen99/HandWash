@@ -1,3 +1,4 @@
+from utils import video_to_3d
 import torch
 from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
@@ -13,7 +14,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, edge=False):
+    def __init__(self, group, output_dir='./dataset', frame_size=(128,128), num_frames=16):
         """
         Constructor for Dataset class
 
@@ -44,9 +45,6 @@ class Handwash_Dataset(Dataset):
 
         # Dataset should belong to only one group: train, test or val
         self.group = group
-        
-        # Whether to preprocess the data
-        self.edge = edge
         
         # Actual Dataset - not including our own
         self.db_dir = './HandWashDataset'
@@ -130,17 +128,23 @@ class Handwash_Dataset(Dataset):
         
         # sample the right number of frames from the npy arrays
         arr = np.load(filename)
-        frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
-        sorted_arr = np.array([arr[i] for i in frames_idxs])
+        
+        arr = self.time_crop(arr, self.num_frames)
+        
+#         frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
+#         arr = np.array([arr[i] for i in frames_idxs])
 
-        if self.group=='train':
-            sorted_arr = sorted_arr*255
-            sorted_arr = self.data_augment(sorted_arr)
-            sorted_arr = sorted_arr / 255
+        if self.group == 'train':
+            arr = self.data_augment(arr)
+            
+        # resize
+        arr = self.resize(arr)
+        
+        # normalize
+        arr = arr / 255
+        arr = arr.transpose(0, 3, 1, 2)
 
-        sorted_arr = sorted_arr.transpose(0, 3, 1, 2)
-
-        return sorted_arr
+        return arr
 
     def show_video(self, class_val, index_val):
         """
@@ -185,48 +189,23 @@ class Handwash_Dataset(Dataset):
                 for idx, filename in enumerate(os.listdir(group_step_dir)):
                     filepath = os.path.join(group_step_dir, filename)
                     save_dir = os.path.join(self.output_dir, group, step, '000{}.npy'.format(idx))
-                    arr = self.video_to_3d(filepath)
+                    arr = video_to_3d(filepath)
                     np.save(save_dir, arr)
+
+    def resize(self, imgs):
+        # TODO: resize (batch_size, 224, 224, 3) to (batch_size, 112, 112, 3)
+        return imgs
     
-    def video_to_3d(self, filename):
-        """
-        Preprocess video into frames
-        """
-        # Process the video
-        capture = cv2.VideoCapture(filename)
-        
-        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    def time_crop(self, buffer, clip_len):
+        # randomly select time index for temporal jittering
+        time_index = np.random.randint(buffer.shape[0] - clip_len)
 
-        # Make sure the video has at least 32 frames
-        EXTRACT_FREQUENCY = 4
-        if frame_count // EXTRACT_FREQUENCY <= 32:
-            EXTRACT_FREQUENCY -= 1
-            if frame_count // EXTRACT_FREQUENCY <= 32:
-                EXTRACT_FREQUENCY -= 1
-                if frame_count // EXTRACT_FREQUENCY <= 32:
-                    EXTRACT_FREQUENCY -= 1
+        # Crop and jitter the video using indexing
+        # The temporal jitter takes place via the selection of consecutive frames
+        buffer = buffer[time_index:time_index + clip_len,:,:,:]
 
-        # Return n frames for each video in numpy format
-        framearray = []
-        count = 0
-        retaining = True
-        
-        while (count < frame_count and retaining):
-            retaining, frame = capture.read()
-            if frame is None:
-                continue
-
-            if count % EXTRACT_FREQUENCY == 0:
-                frame = cv2.resize(frame, self.frame_size)
-                frame = np.asarray(frame) / 255
-                framearray.append(frame)
-                
-            count += 1
-
-        capture.release()
-
-        return np.array(framearray)
-
+        return buffer
+    
     def contrast(self, imgs, factor):
         """
         Adds contrast to the sequence of images
@@ -245,7 +224,6 @@ class Handwash_Dataset(Dataset):
         arr = self.contrast(imgs,contrast_factor)
         
         return arr
-
 
     def __len__(self):
         """

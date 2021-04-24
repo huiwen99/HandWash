@@ -23,7 +23,6 @@ parser.add_argument("--step_size", type=int, default=1, help="set scheduler step
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 parser.add_argument("--checkpoint", type=str, default=None, help="checkpoint to load model")
 parser.add_argument("--save_dir", type=str, default=None, help="file path to save the model")
-parser.add_argument("--edge", type=bool, default=False, help="apply edge detection, bool")
 
 # get arugments
 args = parser.parse_args()
@@ -62,8 +61,6 @@ test_loader = DataLoader(test_ds, 1, shuffle=False)
 # initialize model and optimizer
 if checkpoint:
     model = load_model(model, checkpoint)
-    for param in model.parameters():
-        param.requires_grad = True
 
 optimizer = Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=learning_rate, betas=(beta1, beta2), 
                  weight_decay=weight_decay)

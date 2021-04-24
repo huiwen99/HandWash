@@ -7,6 +7,47 @@ import cv2
 import datetime
 import random
 
+def video_to_3d(filename, img_size=(128,128)):
+        """
+        Preprocess video into frames
+        """
+        # Process the video
+        capture = cv2.VideoCapture(filename)
+        
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        # Make sure the video has at least 32 frames
+        EXTRACT_FREQUENCY = 4
+        if frame_count // EXTRACT_FREQUENCY <= 32:
+            EXTRACT_FREQUENCY -= 1
+            if frame_count // EXTRACT_FREQUENCY <= 32:
+                EXTRACT_FREQUENCY -= 1
+                if frame_count // EXTRACT_FREQUENCY <= 32:
+                    EXTRACT_FREQUENCY -= 1
+
+        # Return n frames for each video in numpy format
+        framearray = []
+        count = 0
+        retaining = True
+        
+        while (count < frame_count and retaining):
+            retaining, frame = capture.read()
+            if frame is None:
+                continue
+
+            if count % EXTRACT_FREQUENCY == 0:
+                frame = cv2.resize(frame, img_size)
+                framearray.append(frame)
+            
+            if len(framearray) == 32:
+                break
+            
+            count += 1
+
+        capture.release()
+
+        return np.array(framearray)
+
 def train(model, device, train_loader, val_loader, optimizer, epoch):
     """
     Trains the model on training data
@@ -60,8 +101,7 @@ def predict(model, video_path, num_frames, edge=False):
     """
     Predicts the label of the video given its filepath
     """
-    frame_size = (64,64)
-    arr = video_to_3d(video_path, num_frames, frame_size, color=True, random_frames=False, edge=edge)
+    arr = video_to_3d(video_path)
     arr = arr.transpose(0, 3, 1, 2)
     arr = np.asarray(arr) / 255
     arr = torch.from_numpy(arr).float()

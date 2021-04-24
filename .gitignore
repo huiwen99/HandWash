@@ -139,6 +139,7 @@ cython_debug/
 
 # Dataset
 HandWashDataset/
+dataset/
 
 # Other files
 .DS_Store
