@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 # arguments to command line
 parser = argparse.ArgumentParser(description="Train model")
 parser.add_argument("--arch", type=str, default="custom", help="set architecture -- convlstm, alexnet, resnet50, custom")
-parser.add_argument("--epochs", type=int, default=10, help="set epochs")
-parser.add_argument("--batch", type=int, default=8, help="set batch size")
+parser.add_argument("--epochs", type=int, default=50, help="set epochs")
+parser.add_argument("--batch", type=int, default=32, help="set batch size")
 parser.add_argument("--num_frames", type=int, default=10, help="set number of frames per video")
 parser.add_argument("--lr", type=float, default=0.001, help="set learning rate")
 parser.add_argument("--beta1", type=float, default=0.9, help="set the first momentum term")
