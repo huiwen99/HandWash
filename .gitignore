@@ -143,3 +143,6 @@ dataset/
 
 # Other files
 .DS_Store
+/handwashUI/node_modules
+/handwashUI/package-lock.json
+/handwashUI/machine_learning/__pycache__
