@@ -1,6 +1,5 @@
 import argparse
 from model import *
-from model2 import * 
 from dataset import *
 from utils import *
 import torch
@@ -8,18 +7,16 @@ from torch.utils.data import DataLoader
 
 # arguments to command line
 parser = argparse.ArgumentParser(description="Evaluate model")
-parser.add_argument("--approach", type=str, default="CNNLSTM", help="choose approach -- ConvLSTM or CNNLSTM")
 parser.add_argument("--dataset", type=str, default="validation", help="choose dataset to evaluate on -- validation or test")
 parser.add_argument("--batch", type=int, default=4, help="set batch size")
 parser.add_argument("--model_dir", type=str, default=None, help="file path to save the model")
-parser.add_argument("--arch", type=str, default="custom", help="set architecture")
+parser.add_argument("--arch", type=str, default="custom", help="set architecture -- convlstm, alexnet, resnet50, custom")
 parser.add_argument("--confusionMatrix", type=bool, default=True, help="print confusion matrix")
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 
 args = parser.parse_args()
 dataset = args.dataset
 confusionMatrix=args.confusionMatrix
-approach = args.approach
 model_dir = args.model_dir
 arch  = args.arch
 cuda=args.cuda
@@ -29,12 +26,7 @@ batch_size = args.batch
 use_cuda = cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
-if approach == "CNNLSTM":
-    model = build_CNNLSTM_model(arch)
-elif approach == "ConvLSTM":
-    model = build_ConvLSTM_model(arch)    
-else: 
-    raise Exception("Invalid approach")
+model = build_model(arch) 
 model.to(device)
 
 model = load_model(model, model_dir)
