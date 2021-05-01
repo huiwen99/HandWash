@@ -23,7 +23,8 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
     `--cuda`: enable cuda training  
     `--checkpoint`: filepath to a checkpoint to load model  
     `--save_dir`: filepath to save the model  
-    `--data_aug`: enable data augmentation during training 
+    `--data_aug`: set data augmentation type: None or `constrast` or `translate`   
+    `--aug_prob`: decide on the probability of the dataset to perform data augmentation
 
 2. `evaluate.py`: Evaluate the trained model on test set.  
 

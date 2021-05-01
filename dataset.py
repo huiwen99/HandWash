@@ -15,7 +15,7 @@ class Handwash_Dataset(Dataset):
     Dataset Class
     """
 
-    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, data_aug=None, aug_prob = 1):
+    def __init__(self, group, output_dir='./dataset', frame_size=(128, 128), num_frames=16, data_aug=None, aug_prob = 1):
         """
         Constructor for Dataset class
 
@@ -139,9 +139,8 @@ class Handwash_Dataset(Dataset):
 #         frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
 #         arr = np.array([arr[i] for i in frames_idxs])
 
-        if self.group == 'train' and self.data_aug is not None and self.data_aug!="spatial":
+        if self.group == 'train' and self.data_aug is not None:
             arr = self.data_augment(arr)
-#             arr = np.concatenate(arr, new_arr)
             
         # resize
         arr = self.resize(arr) 
@@ -199,9 +198,6 @@ class Handwash_Dataset(Dataset):
                     np.save(save_dir, arr)
 
     def resize(self, imgs):
-        if self.data_aug=="spatial":
-            return imgs #returns original size 128,128
-        
         resized_imgs = []
         for img in imgs:
             resized = cv2.resize(img, self.frame_size)

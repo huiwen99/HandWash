@@ -23,7 +23,7 @@ parser.add_argument("--step_size", type=int, default=1, help="set scheduler step
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 parser.add_argument("--checkpoint", type=str, default=None, help="checkpoint to load model")
 parser.add_argument("--save_dir", type=str, default=None, help="file path to save the model")
-parser.add_argument("--data_aug", type=str, default=None, help="set data augmentation type: 'constrast' or 'noise' or 'translate' or 'spatial'")
+parser.add_argument("--data_aug", type=str, default=None, help="set data augmentation type: 'constrast' or 'translate'")
 parser.add_argument("--aug_prob", type=float, default=1, help="decide on the probability of the dataset to perform data augmentation")
 
 # get arguments
