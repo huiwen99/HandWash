@@ -33,13 +33,13 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
      Run the following command:  
      `python evaluate.py`   
 
-    Optional parameters: 
-    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
-    `--dataset`: choose the dataset to evaluate on (either `validation` or `test`)
-    `--batch`: set batch size (for evaluation on validation set)
-    `--model_dir`: filepath to the saved model 
-    `--confusionMatrix`: print confusion matrix if set to True
-    `--cuda`: enable cuda training  
+    Optional parameters:  
+    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)        
+    `--dataset`: choose the dataset to evaluate on (either `validation` or `test`)  
+    `--batch`: set batch size (for evaluation on validation set)  
+    `--model_dir`: filepath to the saved model   
+    `--confusionMatrix`: print confusion matrix if set to True  
+    `--cuda`: enable cuda training    
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
 
