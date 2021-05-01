@@ -26,8 +26,8 @@ class CNN_LSTM(nn.Module):
                 param.requires_grad = False
             self.fc = nn.Sequential(nn.Linear(2048, 128), nn.Dropout())
         else:
-            self.features = nn.Conv2d(3, 16, 3, stride=1, padding=1)
-            self.fc = nn.Sequential(nn.Linear(16*64*64, 128), nn.Dropout())
+            self.features = nn.Conv2d(3, 8, 3, stride=1, padding=1)
+            self.fc = nn.Sequential(nn.Linear(8*64*64, 128), nn.Dropout())
             
         self.rnn = nn.LSTM(128, 256, num_layers = 1)
         self.fc2 = nn.Sequential(nn.Linear(256, 512), nn.ReLU(), nn.Dropout())
@@ -36,7 +36,7 @@ class CNN_LSTM(nn.Module):
     def forward(self, inputs, hidden=None):
         seq_length = len(inputs[0])
         batch_size = len(inputs)
-        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size)
+        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size).cuda()
             
         for j in range(seq_length):
             x = inputs[:,j,:,:]
@@ -54,7 +54,7 @@ class CNN_LSTM(nn.Module):
         output = F.log_softmax(outputs, dim=1)
         return output
 
-def build_model(arch):
+def build_CNNLSTM_model(arch):
     """
     Initializes and returns model
     """

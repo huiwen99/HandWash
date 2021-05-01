@@ -1,18 +1,20 @@
 import argparse
-from model import *
+from model import * 
+from model2 import * 
 from dataset import *
 from utils import *
 import torch
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 
 # arguments to command line
 parser = argparse.ArgumentParser(description="Train model")
+parser.add_argument("--approach", type=str, default="CNNLSTM", help="choose approach -- ConvLSTM or CNNLSTM")
 parser.add_argument("--arch", type=str, default="custom", help="set architecture")
 parser.add_argument("--epochs", type=int, default=10, help="set epochs")
-parser.add_argument("--batch", type=int, default=4, help="set batch size")
+parser.add_argument("--batch", type=int, default=8, help="set batch size")
 parser.add_argument("--num_frames", type=int, default=10, help="set number of frames per video")
 parser.add_argument("--lr", type=float, default=0.001, help="set learning rate")
 parser.add_argument("--beta1", type=float, default=0.9, help="set the first momentum term")
@@ -23,10 +25,12 @@ parser.add_argument("--step_size", type=int, default=1, help="set scheduler step
 parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
 parser.add_argument("--checkpoint", type=str, default=None, help="checkpoint to load model")
 parser.add_argument("--save_dir", type=str, default=None, help="file path to save the model")
-parser.add_argument("--data_aug", type=bool, default=True, help="decide if data augmentation should be performed")
+parser.add_argument("--data_aug", type=str, default=None, help="set data augmentation type: 'constrast' or 'noise' or 'translate' or 'spatial'")
+parser.add_argument("--aug_prob", type=float, default=1, help="decide on the probability of the dataset to perform data augmentation")
 
-# get arugments
+# get arguments
 args = parser.parse_args()
+approach = args.approach
 arch = args.arch
 batch_size = args.batch
 num_frames = args.num_frames
@@ -41,16 +45,22 @@ cuda = args.cuda
 save_dir = args.save_dir
 checkpoint = args.checkpoint
 data_aug = args.data_aug
+aug_prob = args.aug_prob
 
 # set cpu / gpu
 use_cuda = cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
-model = build_model(arch)
+if approach == "CNNLSTM":
+    model = build_CNNLSTM_model(arch)
+elif approach == "ConvLSTM":
+    model = build_ConvLSTM_model(arch)    
+else: 
+    raise Exception("Invalid approach")
 model.to(device)
 
 # Dataset
-train_ds = Handwash_Dataset('train', data_aug=data_aug)
+train_ds = Handwash_Dataset('train', data_aug=data_aug, aug_prob = aug_prob)
 val_ds = Handwash_Dataset('val')
 test_ds = Handwash_Dataset('test')
 
@@ -90,7 +100,7 @@ for epoch in range(1, epochs + 1):
         if val_acc >= best_val_score:
             torch.save(model.state_dict(), save_dir)
             best_val_score = val_acc
-
+            
 # plot learning curves
 plot_curves(train_losses, val_losses, "Loss curves")
 plot_curves(train_accs, val_accs, "Accuracy curves")

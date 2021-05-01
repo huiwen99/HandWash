@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 import datetime
 import random
+import pandas as pd
 
 def video_to_3d(filename, img_size=(128,128)):
     """
@@ -65,20 +66,20 @@ def train(model, device, train_loader, val_loader, optimizer, epoch):
         loss.backward()
         optimizer.step()
 
-    train_loss, train_acc = evaluate(model, device, train_loader)
+    train_loss, train_acc,train_cm = evaluate(model, device, train_loader)
     print('Train Epoch: {} @ {} \nTrain Loss: {:.4f} - Train Accuracy: {:.1f}%'.format(
         epoch, datetime.datetime.now().time(), train_loss, train_acc))
 
-    val_loss, val_acc = evaluate(model, device, val_loader)
+    val_loss, val_acc,val_cm = evaluate(model, device, val_loader)
     print("Val Loss: {:.4f} - Val Accuracy: {:.1f}%".format(val_loss, val_acc))
 
     return train_loss, train_acc, val_loss, val_acc
 
-
 def evaluate(model, device, data_loader):
     """
-    Evaluates the model and returns loss, accuracy
+    Evaluates the model and returns loss, accuracy and confusion matrix
     """
+    confusion = {} #key: predicted_actual
     model.eval()
     loss = 0
     correct = 0
@@ -90,34 +91,28 @@ def evaluate(model, device, data_loader):
             criterion = nn.CrossEntropyLoss()
             loss += criterion(output, target)
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            for ind in range(len(pred)): #for confusion matrix
+                key = str(int(pred[ind]))+"_"+str(int(target[ind]))
+                if key in confusion:
+                    confusion[key] = confusion[key]+1
+                else:
+                    confusion[key] = 1
+  
             correct += pred.eq(target.view_as(pred)).sum().item()
 
     loss /= len(data_loader)
     acc = 100. * correct / len(data_loader.dataset)
+    df = getConfusiondf(confusion)
+    return loss, acc,df
 
-    return loss, acc
-
-def predict(model, device, video_path, num_frames = 16):
+def predict(model, video_path, num_frames, edge=False):
     """
     Predicts the label of the video given its filepath
     """
-
     arr = video_to_3d(video_path)
-    
-    # randomly select time index for temporal jittering
-    time_index = np.random.randint(arr.shape[0] - num_frames)
-
-    # Crop and jitter the video using indexing
-    # The temporal jitter takes place via the selection of consecutive frames
-    arr = arr[time_index:time_index + num_frames,:,:,:]
-    
-    # resize
-    arr = np.array([cv2.resize(img, (64,64)) for img in arr])
-    arr = np.asarray(arr) / 255
     arr = arr.transpose(0, 3, 1, 2)
-    arr = np.expand_dims(arr, axis=0)
+    arr = np.asarray(arr) / 255
     arr = torch.from_numpy(arr).float()
-        
     output = model(arr)
     pred = output.argmax(dim=1, keepdim=True).item()
     classes = {0: 'step_1',
@@ -152,3 +147,46 @@ def plot_curves(train_arrs, val_arrs, plot_name):
     plt.legend()
     plt.show()
     
+def getConfusiondf(d):
+    final =[]
+    for p in range(12):
+        row = []
+        for t in range(12):
+            key = str(p)+"_"+str(t)
+            if key in d:
+                row.append(d[key])
+            else:
+                row.append(0)
+        final.append(row)
+    df = pd.DataFrame(final, columns=[i for i in range(12)])
+    return df   
+
+def evaluate(model, device, data_loader):
+    """
+    Evaluates the model and returns loss, accuracy and confusion matrix
+    """
+    confusion = {} #key: predicted_actual
+    model.eval()
+    loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in data_loader:
+            data, target = data.to(device), target.to(device)
+            target = torch.argmax(target, dim=1).long()
+            output = model(data)
+            criterion = nn.CrossEntropyLoss()
+            loss += criterion(output, target)
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            for ind in range(len(pred)): #for confusion matrix
+                key = str(int(pred[ind]))+"_"+str(int(target[ind]))
+                if key in confusion:
+                    confusion[key] = confusion[key]+1
+                else:
+                    confusion[key] = 1
+  
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    loss /= len(data_loader)
+    acc = 100. * correct / len(data_loader.dataset)
+    df = getConfusiondf(confusion)
+    return loss, acc,df

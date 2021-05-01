@@ -8,13 +8,14 @@ import numpy as np
 import os, os.path
 import random
 import scipy.ndimage
+from skimage.util import random_noise
 
 class Handwash_Dataset(Dataset):
     """
     Dataset Class
     """
 
-    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, data_aug=True):
+    def __init__(self, group, output_dir='./dataset', frame_size=(64,64), num_frames=16, data_aug=None, aug_prob = 1):
         """
         Constructor for Dataset class
 
@@ -47,6 +48,8 @@ class Handwash_Dataset(Dataset):
         self.group = group
         
         self.data_aug = data_aug
+        
+        self.aug_prob = aug_prob
         
         # Actual Dataset - not including our own
         self.db_dir = './HandWashDataset'
@@ -136,11 +139,12 @@ class Handwash_Dataset(Dataset):
 #         frames_idxs = sorted(random.sample(range(0, len(arr)), self.num_frames))
 #         arr = np.array([arr[i] for i in frames_idxs])
 
-        if self.group == 'train' and self.data_aug:
+        if self.group == 'train' and self.data_aug is not None and self.data_aug!="spatial":
             arr = self.data_augment(arr)
+#             arr = np.concatenate(arr, new_arr)
             
         # resize
-        arr = self.resize(arr)
+        arr = self.resize(arr) 
         
         # normalize
         arr = arr / 255
@@ -195,6 +199,9 @@ class Handwash_Dataset(Dataset):
                     np.save(save_dir, arr)
 
     def resize(self, imgs):
+        if self.data_aug=="spatial":
+            return imgs #returns original size 128,128
+        
         resized_imgs = []
         for img in imgs:
             resized = cv2.resize(img, self.frame_size)
@@ -217,18 +224,44 @@ class Handwash_Dataset(Dataset):
         Adds contrast to the sequence of images
         """
         factor = float(factor)
-        arr = np.clip(128 + factor * imgs - factor * 128, 0, 255).astype(np.uint8)
-        return arr
+        arr = []
+        
+        for img in imgs:
+            if random.randrange(0, 100) < self.aug_prob * 100:
+                arr.append(np.clip(128 + factor * img - factor * 128, 0, 255).astype(np.uint8))
+            else:
+                arr.append(img)
+        return np.array(arr)
+
+    def translate(self, imgs, factor):
+        """
+        Do translation to the sequence of images
+        """
+        arr = []
+        if random.randrange(0, 100) < 50: #0.5 chance shifting to the left       
+            factor = -factor
+        for img in imgs:
+            if random.randrange(0, 100) < self.aug_prob * 100:
+                trans_width = img.shape[1]*factor
+                T = np.float32([[1, 0, trans_width], [0, 1, 0]])
+                arr_translation = cv2.warpAffine(img, T, (img.shape[1], img.shape[0])) # width , height
+                arr.append(arr_translation)
+            else:
+                arr.append(img)
+        return np.array(arr)
 
     def data_augment(self, imgs):
         """
         Performs transformation on the sequence of images
         """
         arr = imgs
-        # contrast
-        contrast_factor = random.uniform(0.9,1.1)
-        arr = self.contrast(imgs,contrast_factor)
-        
+        if self.data_aug == "contrast":
+            contrast_factor = random.uniform(0.9,1.1)
+            arr = self.contrast(imgs,contrast_factor)
+        elif self.data_aug == "translate":
+            translate_factor = random.uniform(0.05,0.2)
+            arr = self.translate(imgs, translate_factor)
+            
         return arr
 
     def __len__(self):
