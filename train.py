@@ -1,6 +1,5 @@
 import argparse
 from model import * 
-from model2 import * 
 from dataset import *
 from utils import *
 import torch
@@ -11,8 +10,7 @@ import matplotlib.pyplot as plt
 
 # arguments to command line
 parser = argparse.ArgumentParser(description="Train model")
-parser.add_argument("--approach", type=str, default="CNNLSTM", help="choose approach -- ConvLSTM or CNNLSTM")
-parser.add_argument("--arch", type=str, default="custom", help="set architecture")
+parser.add_argument("--arch", type=str, default="custom", help="set architecture -- convlstm, alexnet, resnet50, custom")
 parser.add_argument("--epochs", type=int, default=10, help="set epochs")
 parser.add_argument("--batch", type=int, default=8, help="set batch size")
 parser.add_argument("--num_frames", type=int, default=10, help="set number of frames per video")
@@ -30,7 +28,6 @@ parser.add_argument("--aug_prob", type=float, default=1, help="decide on the pro
 
 # get arguments
 args = parser.parse_args()
-approach = args.approach
 arch = args.arch
 batch_size = args.batch
 num_frames = args.num_frames
@@ -51,12 +48,7 @@ aug_prob = args.aug_prob
 use_cuda = cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
-if approach == "CNNLSTM":
-    model = build_CNNLSTM_model(arch)
-elif approach == "ConvLSTM":
-    model = build_ConvLSTM_model(arch)    
-else: 
-    raise Exception("Invalid approach")
+model = build_model(arch)
 model.to(device)
 
 # Dataset
