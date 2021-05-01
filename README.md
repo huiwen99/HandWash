@@ -10,7 +10,7 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
     `python train.py`
 
     Optional parameters:  
-    `--arch`: set architecture (either `alexnet` or `resnet50`)      
+    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
     `--epochs`: set number of training epochs  
     `--batch`: set batch size  
     `--num_frames`: set number of frames per video
@@ -23,7 +23,7 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
     `--cuda`: enable cuda training  
     `--checkpoint`: filepath to a checkpoint to load model  
     `--save_dir`: filepath to save the model  
-    `--data_aug`: enable data augmentation during training  
+    `--data_aug`: enable data augmentation during training 
 
 2. `evaluate.py`: Evaluate the trained model on test set.  
 
@@ -33,6 +33,13 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
      Run the following command:  
      `python evaluate.py`   
 
+    Optional parameters: 
+    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
+    `--dataset`: choose the dataset to evaluate on (either `validation` or `test`)
+    `--batch`: set batch size (for evaluation on validation set)
+    `--model_dir`: filepath to the saved model 
+    `--confusionMatrix`: print confusion matrix if set to True
+    `--cuda`: enable cuda training  
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
 
