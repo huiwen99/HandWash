@@ -41,8 +41,8 @@ Our model weights are too large to fit in this repository. Download the weights 
      where the `arch` parameter has to match the architecture of the saved model.
 
     Optional parameters:       
-    `--model_dir`: file path to save the model 
-    `--arch`: set architecture -- convlstm, alexnet, resnet50, custom"
+    `--model_dir`: file path to save the model  
+    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)  
     `--confusionMatrix`: print confusion matrix if set to True  
     `--cuda`: enable cuda training
 
