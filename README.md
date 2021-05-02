@@ -40,9 +40,9 @@ Our model weights are too large to fit in this repository. Download the weights 
      `!python evaluate.py --model_dir "./alexnet_128.pt" --arch alexnet`  
      where the `arch` parameter has to match the architecture of the saved model.
 
-    Optional parameters: 
+    Optional parameters:  
     `--confusionMatrix`: print confusion matrix if set to True  
-    `--cuda`: enable cuda
+    `--cuda`: enable cuda   
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
 
