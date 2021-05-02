@@ -2,6 +2,7 @@
 
 ## Dataset
 Download the pre-processed numpy dataset to the root directory: `wget https://storage.googleapis.com/dl-big-project/dataset.zip`
+Unzip the file: `unzip ./dataset.zip`
 
 ## Reproducibility
 Our model weights are too large to fit in this repository. Download the weights of our best model in root directory by running the command:  
