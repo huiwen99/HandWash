@@ -11,7 +11,7 @@ def main(argv):
     argv = argv[0].split(',')
     
     # Set CPU
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
 
     model = build_model(arch)
     model.to(device)
