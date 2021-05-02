@@ -7,6 +7,7 @@ Due to the recent COVID-19 outbreak, handwashing with soap can be one of the def
 <img src="./Se_arch.png">
 
 ## Model Information
+Download the latest trained Alexnet trained model [here](https://storage.googleapis.com/dl-big-project/alexnet_128.pt) and place into ./machine_learning/model   
 Please visit [Model Info](https://github.com/huiwen99/HandWash)
 
 ## Screenshot

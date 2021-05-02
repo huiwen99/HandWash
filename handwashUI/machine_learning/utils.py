@@ -4,7 +4,6 @@ import torch.nn as nn
 import numpy as np
 import cv2
 import datetime
-import random
 
 def video_to_3d(filename, img_size=(128,128)):
     """
@@ -96,11 +95,10 @@ def evaluate(model, device, data_loader):
 
     return loss, acc
 
-def predict(model, device, video_path, num_frames = 16):
+def predict(model, video_path, num_frames = 16):
     """
     Predicts the label of the video given its filepath
     """
-
     arr = video_to_3d(video_path)
     
     # randomly select time index for temporal jittering
@@ -109,14 +107,13 @@ def predict(model, device, video_path, num_frames = 16):
     # Crop and jitter the video using indexing
     # The temporal jitter takes place via the selection of consecutive frames
     arr = arr[time_index:time_index + num_frames,:,:,:]
-    
+
     # resize
-    arr = np.array([cv2.resize(img, (64,64)) for img in arr])
     arr = np.asarray(arr) / 255
     arr = arr.transpose(0, 3, 1, 2)
     arr = np.expand_dims(arr, axis=0)
     arr = torch.from_numpy(arr).float()
-        
+
     output = model(arr)
     pred = output.argmax(dim=1, keepdim=True).item()
     classes = {0: 'Step 1',

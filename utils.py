@@ -105,14 +105,29 @@ def evaluate(model, device, data_loader):
     df = getConfusiondf(confusion)
     return loss, acc,df
 
-def predict(model, video_path, num_frames, edge=False):
+def predict(model, video_path, num_frames = 16):
     """
     Predicts the label of the video given its filepath
     """
     arr = video_to_3d(video_path)
-    arr = arr.transpose(0, 3, 1, 2)
+    
+    # randomly select time index for temporal jittering
+    time_index = np.random.randint(arr.shape[0] - num_frames)
+
+    # Crop and jitter the video using indexing
+    # The temporal jitter takes place via the selection of consecutive frames
+    arr = arr[time_index:time_index + num_frames,:,:,:]
+
+    # resize
     arr = np.asarray(arr) / 255
+    arr = arr.transpose(0, 3, 1, 2)
+    
+    # display
+    display_frames(arr)
+
+    arr = np.expand_dims(arr, axis=0)
     arr = torch.from_numpy(arr).float()
+
     output = model(arr)
     pred = output.argmax(dim=1, keepdim=True).item()
     classes = {0: 'step_1',
@@ -130,11 +145,28 @@ def predict(model, video_path, num_frames, edge=False):
     prediction = classes[pred]
     return prediction
 
+def display_frames(arr):
+    display_arr = arr.transpose(0, 2, 3, 1)
+
+    fig, ax = plt.subplots(nrows=4, ncols=4,figsize=(15,15))
+    for i in range(display_arr.shape[0]):
+        frame = display_arr[i]
+        # convert to rgb
+        frame = frame[:,:,::-1]
+        
+        ax.ravel()[i].imshow(frame)
+        ax.ravel()[i].set_title('Frame {}'.format(i))
+        ax.ravel()[i].set_axis_off()
+    plt.show()
+    
+    arr = np.expand_dims(arr, axis=0)
+    arr = torch.from_numpy(arr).float()
+
 def load_model(model, model_path):
     """
     Load model from file path
     """
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location='cpu'))
     return model
 
 def plot_curves(train_arrs, val_arrs, plot_name):
