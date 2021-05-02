@@ -36,10 +36,10 @@ Our model weights are too large to fit in this repository. Download the weights 
      For example, the model is saved as `"./alexnet_128.pt"`.  
      
      Run the following command:  
-     `python evaluate.py --model_dir "./alexnet_128.pt"`   
+     `python evaluate.py --model_dir "./alexnet_128.pt" --arch alexnet`
+     where the `arch` parameter has to match the architecture of the saved model.
 
-    Optional parameters:  
-    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)        
+    Optional parameters:        
     `--dataset`: choose the dataset to evaluate on (either `validation` or `test`)  
     `--batch`: set batch size (for evaluation on validation set)  
     `--confusionMatrix`: print confusion matrix if set to True  
