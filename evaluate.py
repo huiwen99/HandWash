@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description="Evaluate model")
 parser.add_argument("--model_dir", type=str, default=None, help="file path to save the model")
 parser.add_argument("--arch", type=str, default="custom", help="set architecture -- convlstm, alexnet, resnet50, custom")
 parser.add_argument("--confusionMatrix", type=bool, default=True, help="print confusion matrix if set to True")
-parser.add_argument("--cuda", type=bool, default=True, help="enable cuda training")
+parser.add_argument("--cuda", type=bool, default=True, help="enable cuda")
 
 args = parser.parse_args()
 model_dir = args.model_dir
