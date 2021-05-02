@@ -9,7 +9,6 @@ def main(argv):
     savedModelPath = './machine_learning/model/alexnet_128.pt'
     arch = 'alexnet'
     argv = argv[0].split(',')
-    
     # Set CPU
     device = torch.device('cpu')
 
