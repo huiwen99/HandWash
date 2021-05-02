@@ -8,6 +8,8 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
 
     To train the default model, run the following command:
     `python train.py`
+    
+    To load in the best model: `wget https://storage.googleapis.com/dl-big-project/alexnet_128.pt`
 
     Optional parameters:  
     `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
