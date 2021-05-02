@@ -151,16 +151,11 @@ def display_frames(arr):
     fig, ax = plt.subplots(nrows=4, ncols=4,figsize=(15,15))
     for i in range(display_arr.shape[0]):
         frame = display_arr[i]
-        # convert to rgb
         frame = frame[:,:,::-1]
-        
         ax.ravel()[i].imshow(frame)
         ax.ravel()[i].set_title('Frame {}'.format(i))
         ax.ravel()[i].set_axis_off()
     plt.show()
-    
-    arr = np.expand_dims(arr, axis=0)
-    arr = torch.from_numpy(arr).float()
 
 def load_model(model, model_path):
     """
