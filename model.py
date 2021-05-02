@@ -37,7 +37,7 @@ class CNN_LSTM(nn.Module):
     def forward(self, inputs, hidden=None):
         seq_length = len(inputs[0])
         batch_size = len(inputs)
-        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size).cuda()
+        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size)
             
         for j in range(seq_length):
             x = inputs[:,j,:,:]

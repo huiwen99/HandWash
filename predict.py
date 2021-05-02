@@ -24,4 +24,4 @@ model = load_model(model, checkpoint)
 
 output = predict(model, video_path)
 
-print(output)
+print("Prediction:", output)
