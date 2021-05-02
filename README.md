@@ -36,7 +36,7 @@ Our model weights are too large to fit in this repository. Download the weights 
      For example, the model is saved as `"./alexnet_128.pt"`.  
      
      Run the following command:  
-     `python evaluate.py --model_dir "./alexnet_128.pt" --arch alexnet`
+     `python evaluate.py --model_dir "./alexnet_128.pt" --arch alexnet`  
      where the `arch` parameter has to match the architecture of the saved model.
 
     Optional parameters:        
