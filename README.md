@@ -18,8 +18,8 @@ Our model weights are too large to fit in this repository. Download the weights 
     `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
     `--epochs`: set number of training epochs  
     `--batch`: set batch size  
-    `--num_frames`: set number of frames per video
-    `--lr`: set learning rate  
+    `--num_frames`: set number of frames per video  
+    `--lr`: set learning rate    
     `--beta1`: set first momentum term for Adam optimizer  
     `--beta2`: set second momentum term for Adam optimizer  
     `--weight_decay`: set weight decay for regularization on loss function  
