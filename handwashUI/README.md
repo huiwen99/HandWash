@@ -7,12 +7,30 @@ Due to the recent COVID-19 outbreak, handwashing with soap can be one of the def
 <img src="./Se_arch.png">
 
 ## Model Information
-Download the latest trained Alexnet trained model [here](https://storage.googleapis.com/dl-big-project/alexnet_128.pt) and place into ./machine_learning/model   
-Please visit [Model Info](https://github.com/huiwen99/HandWash)
+Download the latest pre-trained Alexnet trained model [here](https://storage.googleapis.com/dl-big-project/alexnet_128.pt) and place into ./machine_learning/model   
+For more information regarding the model architecture: [Model Info](https://github.com/huiwen99/HandWash)
 
 ## Screenshot
 <img src="./ss_1.png" width="800" height="800">
 <img src="./ss_2.png" width="800" height="800">
+
+## Installation
+Ensure that the pretrained Pytorch Model is in ```./machine_learning/model``` before running, refer to [Model Information](#model-information)
+You will need to have the following packages found under [Technologies](#technologies) to run. 
+
+##### Local:
+Change directory to handwashUI: ```cd HandWash/handwashUI/``` then install required packages:  ```npm install```. 
+Run the server and front end concurrently by: ```npm run dev```
+
+##### Cloud Server:
+Tested on AWS EC2 Instance (t2.medium with 16GB Disk Storage on Ubuntu LTS 20.X). 
+Note that the API URL axios address calls found in ```App.js``` and ```fileupload.js``` must be changed.
+
+
+
+## Demo
+[![YouTube Demo Link](http://img.youtube.com/vi/DLfKYGBf7oE/0.jpg)](https://www.youtube.com/watch?v=DLfKYGBf7oE "50.039 : Theory and Practice of Deep Learning_BigProject_Group5_HandWash")
+
 
 ## Technologies
 - [React](https://reactjs.org/)
@@ -20,13 +38,3 @@ Please visit [Model Info](https://github.com/huiwen99/HandWash)
 - [PyTorch](https://pytorch.org/)
 - [OpenCV](https://opencv.org/)
 - [Numpy](https://numpy.org/)
-
-## Installation
-Either run it locally or on an AWS EC2 Instance (XLarge with 32GB Disk Storage on Ubuntu LTS 20.X). You will need to have the following packages found under Technologies to run. Note that the API URL address calls found in ```App.js``` and ```fileupload.js``` must be changed if running on a cloud server, for running locally, no changes are required. Ensure that there is a root folder called ```uploads``` before uploading any files.
-
-## Demo
-[![YouTube Demo Link](http://img.youtube.com/vi/DLfKYGBf7oE/0.jpg)](https://www.youtube.com/watch?v=DLfKYGBf7oE "50.039 : Theory and Practice of Deep Learning_BigProject_Group5_HandWash")
-
-
-```npm install```
-```npm run dev```

@@ -52,3 +52,10 @@ class CNN_LSTM(nn.Module):
         outputs = self.classifier(outputs)
         output = F.log_softmax(outputs, dim=1)
         return output
+
+def build_model(arch):
+    """
+    Initialize and returns model
+    """
+
+    return CNN_LSTM(arch)
