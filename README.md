@@ -1,7 +1,7 @@
 # HandWash
 
 ## Dataset
-Download the pre-processed numpy dataset to the root directory: `wget https://storage.googleapis.com/dl-big-project/dataset.zip`
+Download the pre-processed numpy dataset to the root directory: `wget https://storage.googleapis.com/dl-big-project/dataset.zip`  
 Unzip the file: `unzip ./dataset.zip`
 
 ## Reproducibility
