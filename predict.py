@@ -22,6 +22,6 @@ model.to(device)
 
 model = load_model(model, checkpoint)
 
-output = predict(model,device, video_path)
+output = predict(model, video_path)
 
 print(output)

@@ -105,14 +105,25 @@ def evaluate(model, device, data_loader):
     df = getConfusiondf(confusion)
     return loss, acc,df
 
-def predict(model, video_path, num_frames, edge=False):
+def predict(model, video_path, num_frames = 16):
     """
     Predicts the label of the video given its filepath
     """
     arr = video_to_3d(video_path)
-    arr = arr.transpose(0, 3, 1, 2)
+    
+    # randomly select time index for temporal jittering
+    time_index = np.random.randint(arr.shape[0] - num_frames)
+
+    # Crop and jitter the video using indexing
+    # The temporal jitter takes place via the selection of consecutive frames
+    arr = arr[time_index:time_index + num_frames,:,:,:]
+
+    # resize
     arr = np.asarray(arr) / 255
+    arr = arr.transpose(0, 3, 1, 2)
+    arr = np.expand_dims(arr, axis=0)
     arr = torch.from_numpy(arr).float()
+
     output = model(arr)
     pred = output.argmax(dim=1, keepdim=True).item()
     classes = {0: 'step_1',
