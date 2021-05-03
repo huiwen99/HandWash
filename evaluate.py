@@ -11,12 +11,10 @@ parser.add_argument("--dataset", type=str, default="test", help="choose dataset 
 parser.add_argument("--batch", type=int, default=32, help="set batch size")
 parser.add_argument("--checkpoint", type=str, default=None, help="file path to save the model")
 parser.add_argument("--arch", type=str, default="alexnet", help="set architecture -- convlstm, alexnet, resnet50, custom")
-parser.add_argument("--confusionMatrix", type=bool, default=True, help="print confusion matrix")
 parser.add_argument("--cuda", type=bool, default=False, help="enable cuda training")
 
 args = parser.parse_args()
 dataset = args.dataset
-confusionMatrix=args.confusionMatrix
 checkpoint = args.checkpoint
 arch  = args.arch
 cuda=args.cuda
@@ -49,5 +47,4 @@ model.eval()
 
 loss, acc,cm = evaluate(model, device, loader)
 print(dataset,'\nLoss: {:.4f} - Accuracy: {:.1f}%\n'.format(loss, acc))
-if confusionMatrix:
-    print(f"Confusion Matrix:\n{cm}")
+print(f"Confusion Matrix:\n{cm}")
