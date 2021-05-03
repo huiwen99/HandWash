@@ -10,9 +10,10 @@ class CNN_LSTM(nn.Module):
     Model with Convolutional LSTM architecture
     """
 
-    def __init__(self, arch):
+    def __init__(self, arch, device):
         super(CNN_LSTM, self).__init__()
-        
+        # set device
+        self.device = device
          # select a base model
         if arch.startswith('alexnet'):
             net = models.alexnet(pretrained=True)
@@ -37,7 +38,7 @@ class CNN_LSTM(nn.Module):
     def forward(self, inputs, hidden=None):
         seq_length = len(inputs[0])
         batch_size = len(inputs)
-        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size)
+        lstm_in = torch.zeros(seq_length, batch_size, self.rnn.input_size).to(self.device)
             
         for j in range(seq_length):
             x = inputs[:,j,:,:]
@@ -252,7 +253,7 @@ class ConvLSTM(nn.Module):
         return param
 
     
-def build_model(arch):
+def build_model(arch, device):
     """
     Initializes and returns model
     """
@@ -266,4 +267,4 @@ def build_model(arch):
                  return_all_layers=False)
         return conv_lstm
     else:
-        return CNN_LSTM(arch)
+        return CNN_LSTM(arch, device)
