@@ -20,7 +20,7 @@ cuda=args.cuda
 use_cuda = cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
-model = build_model(arch)
+model = build_model(arch, device)
 model.to(device)
 
 model = load_model(model, checkpoint)
