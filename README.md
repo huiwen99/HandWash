@@ -37,12 +37,12 @@ Our model weights are too large to fit in this repository. Download the weights 
      For example, the model is saved as `"./alexnet_128.pt"`.  
      
      Run the following command:  
-     `!python evaluate.py --model_dir "./alexnet_128.pt" --arch alexnet`  
+     `!python evaluate.py --checkpoint "./alexnet_128.pt" --arch alexnet`  
      where the `arch` parameter has to match the architecture of the saved model.
-
-    Optional parameters:  
-    `--confusionMatrix`: print confusion matrix if set to True  
-    `--cuda`: enable cuda   
+     
+     Optional parameters:  
+     `--confusion_matrix`: print confusion matrix 
+     `--cuda`: enable cuda   
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
 

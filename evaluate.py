@@ -7,25 +7,22 @@ from torch.utils.data import DataLoader
 
 # arguments to command line
 parser = argparse.ArgumentParser(description="Evaluate model")
-parser.add_argument("--model_dir", type=str, default=None, help="file path to save the model")
+parser.add_argument("--checkpoint", type=str, default=None, help="file path to save the model")
 parser.add_argument("--arch", type=str, default="custom", help="set architecture -- convlstm, alexnet, resnet50, custom")
-parser.add_argument("--confusionMatrix", type=bool, default=True, help="print confusion matrix if set to True")
-parser.add_argument("--cuda", type=bool, default=True, help="enable cuda")
+parser.add_argument("--confusion_matrix", type=bool, default=True, help="print confusion matrix if set to True")
 
 args = parser.parse_args()
-model_dir = args.model_dir
+checkpoint = args.checkpoint
 arch  = args.arch
-confusionMatrix=args.confusionMatrix
-cuda=args.cuda
+confusion_matrix=args.confusion_matrix
 
-# set cpu / gpu
-use_cuda = cuda and torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
+# set cpu
+device = torch.device("cpu")
 
 model = build_model(arch) 
 model.to(device)
 
-model = load_model(model, model_dir)
+model = load_model(model, checkpoint)
 
 # dataset and dataloader
 ds = Handwash_Dataset('test')
@@ -33,8 +30,8 @@ loader = DataLoader(ds, 1, shuffle=False)
 
 model.eval()
 
-loss, acc,cm = evaluate(model, device, loader)
+loss, acc, cm = evaluate(model, device, loader)
 print('\nLoss: {:.4f} - Accuracy: {:.1f}%\n'.format(loss, acc))
-if confusionMatrix:
+if confusion_matrix:
     print(f"Confusion Matrix:\n{cm}")
     
