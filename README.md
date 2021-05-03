@@ -41,7 +41,9 @@ Our model weights are too large to fit in this repository. Download the weights 
      where the `arch` parameter has to match the architecture of the saved model.
      
      Optional parameters:  
-     `--confusion_matrix`: print confusion matrix   
+     `--dataset`: choose dataset to evaluate on -- `validation` or `test`   
+     `--batch`: set batch size    
+     `--confusion_matrix`: print confusion matrix    
      `--cuda`: enable cuda   
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
@@ -51,6 +53,10 @@ Our model weights are too large to fit in this repository. Download the weights 
     Run the following command:  
     `%run predict.py --checkpoint "./alexnet_128.pt" --video_path video_file_path`  
     where `video_file_path` is the file path to the video. 
+    
+    Optional parameters:  
+    `--cuda`: enable cuda   
+
     
 ## Experiments -- Description of notebooks 
 The following notebooks are for experiments to find the best hyperparameters and data augmentation.
