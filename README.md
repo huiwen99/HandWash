@@ -8,6 +8,8 @@ Unzip the file: `unzip ./dataset.zip`
 Our model weights are too large to fit in this repository. Download the weights of our best model into the `save_weights` folder by running the command:  
 `wget https://storage.googleapis.com/dl-big-project/alexnet_128.pt`
 
+** There are known to be non-deterministic issues for RNN functions of CUDA. Therefore, when using our saved model weights, there might be some variations in the validation/test accuracy and confusion matrix.
+
 ## Instructions to run python files in the notebook
 1. `train.py`: Trains the chosen architecture on the numpy dataset. The default model is CNN-LSTM with custom CNN layers.  
 
