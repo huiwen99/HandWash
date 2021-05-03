@@ -5,7 +5,7 @@ Download the pre-processed numpy dataset to the root directory: `wget https://st
 Unzip the file: `unzip ./dataset.zip`
 
 ## Reproducibility
-Our model weights are too large to fit in this repository. Download the weights of our best model in root directory by running the command:  
+Our model weights are too large to fit in this repository. Download the weights of our best model into the `save_weights` folder by running the command:  
 `wget https://storage.googleapis.com/dl-big-project/alexnet_128.pt`
 
 ## Instructions to run python files in the notebook
@@ -51,3 +51,14 @@ Our model weights are too large to fit in this repository. Download the weights 
     Run the following command:  
     `%run predict.py --checkpoint "./alexnet_128.pt" --video_path video_file_path`  
     where `video_file_path` is the file path to the video. 
+    
+## Experiments -- Description of notebooks 
+The following notebooks are for experiments to find the best hyperparameters and data augmentation.
+1. `Model Experiments.ipynb` : Training and experiments are done here.
+    a. Tested out 4 different architectures ConvLSTM and CNN-LSTM with AlexNet, ResNet-50 and custom.  
+    b. After finding the best model amongst the 4 architectures, apply hyperparameter tuning by varying the batch size, learning rate and spatial dimensions.  
+    c. Once we have derived the best parameters to use with the best model, apply data augmentation such as contrast and translation.  
+
+2. `Model Experiments Testing.ipynb` : Testing of experimental models on validation and test sets. 
+- Follow the instructions in this notebook if you would like to download the experimental models and retest them on the validation set. 
+
