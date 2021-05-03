@@ -54,11 +54,11 @@ Our model weights are too large to fit in this repository. Download the weights 
     
 ## Experiments -- Description of notebooks 
 The following notebooks are for experiments to find the best hyperparameters and data augmentation.
-1. `Model Experiments.ipynb` : Training and experiments are done here.
+1. `Model Experiments.ipynb` : Training and experiments are done here.  
     a. Tested out 4 different architectures ConvLSTM and CNN-LSTM with AlexNet, ResNet-50 and custom.  
     b. After finding the best model amongst the 4 architectures, apply hyperparameter tuning by varying the batch size, learning rate and spatial dimensions.  
     c. Once we have derived the best parameters to use with the best model, apply data augmentation such as contrast and translation.  
 
 2. `Model Experiments Testing.ipynb` : Testing of experimental models on validation and test sets. 
-- Follow the instructions in this notebook if you would like to download the experimental models and retest them on the validation set. 
+- Follow the instructions in the `Model Experiments Testing.ipynb` notebook if you would like to download the experimental models and retest them on the validation set. 
 
