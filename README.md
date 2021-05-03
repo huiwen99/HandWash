@@ -43,7 +43,6 @@ Our model weights are too large to fit in this repository. Download the weights 
      Optional parameters:  
      `--dataset`: choose dataset to evaluate on -- `validation` or `test`   
      `--batch`: set batch size    
-     `--confusion_matrix`: print confusion matrix    
      `--cuda`: enable cuda   
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
