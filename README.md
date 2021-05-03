@@ -55,6 +55,7 @@ Our model weights are too large to fit in this repository. Download the weights 
     where `video_file_path` is the file path to the video. 
     
     Optional parameters:  
+    `--arch`: set architecture (either `convlstm` or `alexnet` or `resnet50` or `custom`)      
     `--cuda`: enable cuda   
 
     
