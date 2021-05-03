@@ -41,7 +41,7 @@ Our model weights are too large to fit in this repository. Download the weights 
      where the `arch` parameter has to match the architecture of the saved model.
      
      Optional parameters:  
-     `--confusion_matrix`: print confusion matrix 
+     `--confusion_matrix`: print confusion matrix   
      `--cuda`: enable cuda   
 
 3. `predict.py`: Predicts the class of a video using the trained model.  
