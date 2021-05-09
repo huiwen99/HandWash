@@ -70,3 +70,6 @@ The following notebooks are for experiments to find the best hyperparameters and
 2. `Model Experiments Testing.ipynb` : Testing of experimental models on validation and test sets. 
 - Follow the instructions in the `Model Experiments Testing.ipynb` notebook if you would like to download the experimental models and retest them on the validation set. 
 
+## Demo
+Hosted on [Heroku](https://www.heroku.com) and powered by [StreamLit](https://streamlit.io/).   
+[Demo](https://handwashdl.herokuapp.com/)
